@@ -1,0 +1,28 @@
+{
+  "name": "speechtotext",
+  "version": "1.0.0",
+  "description": "A simple program converts voice to text",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pratiksinghchauhan/SpeechToText.git"
+  },
+  "author": "pratiksinghchauhan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pratiksinghchauhan/SpeechToText/issues"
+  },
+  "homepage": "https://github.com/pratiksinghchauhan/SpeechToText#readme",
+  "dependencies": {
+    "@google-cloud/speech": "^0.9.2",
+    "binaryjs": "^0.2.1",
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "mongodb": "^2.2.26",
+    "node-record-lpcm16": "^0.3.0",
+  }
+}

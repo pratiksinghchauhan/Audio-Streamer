@@ -1,0 +1,17 @@
+
+<a target="_blank" onclick="openWin()">Open</a>
+<a target="_blank" onclick="closeWin()">close</a>
+
+
+<script type="text/javascript">
+   var myWin = null;
+
+   function openWin () {
+       myWin = window.open("https://localhost:9191", "_blank");
+    }
+
+   function closeWin () {
+        myWin.close();
+   }
+
+</script>
