@@ -11,7 +11,7 @@ var bodyParser=require('body-parser');
 var assert = require('assert');
 var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectID;
-var url = 'mongodb://10.0.8.76:27017/SpeechToText';
+var url = 'mongodb://10.0.8.62:27017/SpeechToText';
 
 
 const record = require('node-record-lpcm16');
@@ -113,12 +113,13 @@ server.on('connection', function(client){
     encoding: encoding,
     sampleRateHertz: sampleRateHertz,
     languageCode: languageCode
-    },
+},
+  verbose:true,
   interimResults: true, // If you want interim results, set this to true
 };
 
    client.on('error', console.error)
-         .on('stream', function(stream, meta) {
+         .on('stream', function(stream) {
            console.log("Stream started");
 
   stream.pipe(speech.createRecognizeStream(request)
@@ -126,29 +127,31 @@ server.on('connection', function(client){
   .on('data', (data) =>{ 
       
      // process.stdout.write(data.results),
-      console.log(data);     
+      console.log(data.results);     
                          
       /*MongoClient.connect( url, function(err, db) {
             assert.equal(null, err);
             insertDocument(db , data.results, function() {
                     db.close();
             });
-       });*/       
-            fs.appendFile('results.txt',"Result:" + data +'\n')}));
+       });*/   
+       console.log(data.results[0].isFinal);  
+
+          if(data.results[0].isFinal==true){  
+            console.log("FINAL:" + data.results[0].transcript);
+            fs.appendFile('results.txt',"FINAL:" + data.results[0].transcript +'\n');
+
+            MongoClient.connect( url, function(err, db) {
+            assert.equal(null, err);
+            insertDocument(db , data.results[0].transcript, function() {
+                    db.close();
+            });
+       });
+        
+    
+}}));
+      
       });
-
-/*  record
-  .start({
-    sampleRateHertz: sampleRateHertz,
-    threshold: 0,
-    // Other options, see https://www.npmjs.com/package/node-record-lpcm16#options
-    verbose: false,
-    recordProgram: 'arecord', // Try also "arecord" or "sox"
-    silence: '10.0'
-  })
-  .on('error', console.error)
-  .pipe(recognizeStream);*/
-
   console.log('Listening, press Ctrl+C to stop.');
 	
 });
