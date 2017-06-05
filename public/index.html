@@ -42,14 +42,17 @@
 $(document).ready(function() {
     var startstream=document.getElementById("start-rec-btn");
     var stopstream=document.getElementById("stop-rec-btn")
-    startstream.click();
     //window.top.close();
 
-    var myVar = setInterval(reRec, 50000);
+    document.addEventListener("startrecording", function(){
+        startstream.click();
+    });
+
+    /*var myVar = setInterval(reRec, 50000);
     function reRec(){
         console.log("restreaming");
-        stopstream.click();
+        //stopstream.click();
         startstream.click();
-    }
+    }*/
 });
 </script>

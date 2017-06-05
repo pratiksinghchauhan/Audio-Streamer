@@ -122,19 +122,26 @@ server.on('connection', function(client){
          .on('stream', function(stream) {
            console.log("Stream started");
 
+
   stream.pipe(speech.createRecognizeStream(request)
   .on('error', console.error)
   .on('data', (data) =>{ 
+
+      console.log("data recieved")
       
      // process.stdout.write(data.results),
+     
+    /*function rerec(){
+           console.log("restreaming");
+           stream.pipe();
+       }
+
+     setInterval(rerec, 55000); */
+       
+
       console.log(data.results);     
                          
-      /*MongoClient.connect( url, function(err, db) {
-            assert.equal(null, err);
-            insertDocument(db , data.results, function() {
-                    db.close();
-            });
-       });*/   
+
        console.log(data.results[0].isFinal);  
 
           if(data.results[0].isFinal==true){  
@@ -147,6 +154,10 @@ server.on('connection', function(client){
                     db.close();
             });
        });
+       
+       
+
+       
         
     
 }}));
