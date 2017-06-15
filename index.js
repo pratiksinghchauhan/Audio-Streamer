@@ -12,6 +12,7 @@ var assert = require('assert');
 var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectID;
 var url = 'mongodb://10.0.8.62:27017/SpeechToText';
+var emitter = require('events').EventEmitter;
 
 
 const record = require('node-record-lpcm16');
@@ -23,9 +24,8 @@ const speech = Speech();
 
 
 var options = {
-    key:    fs.readFileSync('ssl/newkey.pem'),
-    cert:   fs.readFileSync('ssl/newcert.pem'), 
-    passphrase: 'pratik',
+    key:    fs.readFileSync('ssl/wildcard_policybazaar_com.key'),
+    cert:   fs.readFileSync('ssl/wildcard_policybazaar_com.crt'), 
 };
 
 
@@ -73,6 +73,9 @@ var insertDocument = function( db, msg, callback) {
 
 
 var server=https.createServer(options,app);
+
+var io = require('socket.io').listen(server);
+
 server.listen(9191,function(){
   console.log("Listening at port 9191");
 });
@@ -81,29 +84,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 var server = binaryServer({server: server});
 
-app.get('/',function(req,res){
-  res.render('index');
-});
 
-/*
-var jsonParser = bodyParser.json()
-
-app.use(bodyParser.urlencoded({
-    extended: true
-}));
-
-app.use(bodyParser.json());
-
-app.post("/", function (req, res) {
-    leadID=req.body.leadID;
-    console.log(leadID);
-});
-*/
 
 server.on('connection', function(client){
 
 	const encoding = 'LINEAR16';
-    const sampleRateHertz = 44000;
+    const sampleRateHertz = 44100;
     const languageCode = 'hi-IN';
 
 
@@ -112,11 +98,15 @@ server.on('connection', function(client){
   config: {
     encoding: encoding,
     sampleRateHertz: sampleRateHertz,
-    languageCode: languageCode
+    languageCode: languageCode,
+   speechContexts: {
+    phrases:["good morning","policybazaar.com","policybazaar","sir", "health","insurance","policy","right","age", "good", "morning","nineteen","ninety seven","forty","thirty eight"]
 },
+  },
   verbose:true,
   interimResults: true, // If you want interim results, set this to true
 };
+
 
    client.on('error', console.error)
          .on('stream', function(stream) {
@@ -128,26 +118,16 @@ server.on('connection', function(client){
   .on('data', (data) =>{ 
 
       console.log("data recieved")
+      //client.send(data);
       
      // process.stdout.write(data.results),
      
     /*function rerec(){
            console.log("restreaming");
            stream.pipe();
-       }
+       }*/
 
-     setInterval(rerec, 55000); */
-       
-
-      console.log(data.results);     
-                         
-
-       console.log(data.results[0].isFinal);  
-
-          if(data.results[0].isFinal==true){  
-            console.log("FINAL:" + data.results[0].transcript);
-            fs.appendFile('results.txt',"FINAL:" + data.results[0].transcript +'\n');
-
+     function savemongo(){     
             MongoClient.connect( url, function(err, db) {
             assert.equal(null, err);
             insertDocument(db , data.results[0].transcript, function() {
@@ -155,14 +135,25 @@ server.on('connection', function(client){
             });
        });
        
+         
+     }
+
+      setInterval(savemongo, 55000); 
        
 
-       
-        
-    
-}}));
-      
-      });
+      console.log(data.results);     
+
+if( typeof data.results[0] != 'undefined'){
+       console.log(data.results[0].isFinal);  
+
+          if(data.results[0].isFinal==true){  
+            console.log("FINAL:" + data.results[0].transcript);
+            fs.appendFile('results.txt',"FINAL:" + data.results[0].transcript +'\n');
+            savemongo();
+   
+}}}));
+
+         });
   console.log('Listening, press Ctrl+C to stop.');
 	
 });

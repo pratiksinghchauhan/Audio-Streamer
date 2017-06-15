@@ -17,6 +17,7 @@ $(function () {
     }, false);
 
     function startrecording(){
+        flag=1;
         close();
         console.log('startrecording called');
         client = new BinaryClient('wss://'+location.host);
@@ -92,7 +93,7 @@ $(function () {
     }
 
     $("#stop-rec-btn").click(function () {
-        flag=1;
+        flag=0;
         close();
     });
 
@@ -102,6 +103,10 @@ $(function () {
             recorder.disconnect();
         if(client)
             client.close();
+    }
+    
+    if(flag==1){
+        setInterval(55000,startrecording)
     }
 });
 
