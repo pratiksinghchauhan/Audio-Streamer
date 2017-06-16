@@ -44,8 +44,6 @@ var insertDocument = function( db, msg, callback) {
 
 var server=https.createServer(options,app);
 
-var io = require('socket.io').listen(server);
-
 server.listen(9191,function(){
   console.log("Listening at port 9191");
 });
@@ -108,7 +106,7 @@ if( typeof data.results[0] != 'undefined'){
        transcript=data.results[0].transcript;
 }
       
-      //console.log(data.results);     
+      console.log(data.results);     
 
 if( typeof data.results[0] != 'undefined'){
        console.log(data.results[0].isFinal);  

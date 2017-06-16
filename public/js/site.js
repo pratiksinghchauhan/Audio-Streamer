@@ -12,6 +12,9 @@ $(function () {
     s4() + '-' + s4() + s4() + s4();
 }
 
+     startstream=document.getElementById("start-rec-btn");
+     stopstream=document.getElementById("stop-rec-btn")
+
 
     var client,
         recorder,
@@ -20,10 +23,24 @@ $(function () {
         contextSampleRate = (new AudioContext()).sampleRate;
         resampleRate = contextSampleRate,
         worker = new Worker('js/worker/resampler-worker.js');
-    var flag=0;
     var uid=guid();
 
+    var flag=0;
+    var myvar=0;
+
     worker.postMessage({cmd:"init",from:contextSampleRate,to:resampleRate});  
+
+    window.addEventListener('message', function(msg) {
+        console.log(msg);
+        if( msg && msg.data.event == 'startrecording' ){
+            console.log('inside client startrecording');
+            startstream.click();
+            leadid = msg.data.leadid;
+        }else if( msg && msg.data.event == 'stoprecording' ){
+            console.log('inside client stoprecording');
+            stopstream.click();
+        }
+    }, false);
 
     worker.addEventListener('message', function (e) {
         if (bStream && bStream.writable)
@@ -31,12 +48,11 @@ $(function () {
     }, false);
 
     function startrecording(){
-        flag=1;
         close();
         console.log('startrecording called');
         client = new BinaryClient('wss://'+location.host);
         client.on('open', function () {
-            bStream = client.createStream({sampleRate: resampleRate,leadID:'38928923',uid:uid});
+            bStream = client.createStream({sampleRate: resampleRate,leadID:leadid,uid:uid});
         });
         if (context) {
             recorder.connect(context.destination);
@@ -62,8 +78,24 @@ $(function () {
         }, function (e) {
         });
     }
+
     $("#start-rec-btn").click(function () {
-        startrecording();
+       
+
+        if(flag==1){
+           return;
+        }
+         startrecording();
+    
+        myvar=setInterval(
+        
+            function reRec(){      
+            console.log("restreaming");
+            startstream.click();
+        }, 50000);
+
+        console.log(flag);
+
         });
 
     function onAudio(e) {
@@ -107,7 +139,8 @@ $(function () {
     }
 
     $("#stop-rec-btn").click(function () {
-        flag=0;
+        flag=1;
+        clearInterval(myvar);
         close();
     });
 

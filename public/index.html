@@ -6,7 +6,6 @@
 
     <link rel="stylesheet" href="bootstrap-3.2.0-dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="style/site.css">
-    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <link rel="icon" type="image/png"  href="img/icon.png">
     <script src="js/binary.js"></script>
     <script src="js/jquery-1.11.1.min.js"></script>
@@ -21,10 +20,6 @@
       <h1><span class="glyphicon glyphicon-record"></span> Audio Streamer <small>realtime to node</small></h1>
     </div>
 
-   <form method="post" action="">
-    <input type="text" disabled="true" name="leadID" placeholder="leadID" class="form-control">
-    <button class="btn btn-primary" disabled="true" type="submit">Submit</button>
-  </form>
   <br><br>
       <button class="btn btn-primary" id="start-rec-btn">Start Recording</button>
     <button class="btn btn-primary" id="stop-rec-btn">Stop Recording</button>
@@ -72,7 +67,6 @@ $(document).ready(function() {
         clearInterval(myvar);
         console.log(flag);
     });
-
 
 });
 </script>
