@@ -22,7 +22,7 @@ $(function () {
         console.log('startrecording called');
         client = new BinaryClient('wss://'+location.host);
         client.on('open', function () {
-            bStream = client.createStream({sampleRate: resampleRate});
+            bStream = client.createStream({sampleRate: resampleRate,leadID:'38928923'});
         });
         if (context) {
             recorder.connect(context.destination);
@@ -105,9 +105,6 @@ $(function () {
             client.close();
     }
     
-    if(flag==1){
-        setInterval(55000,startrecording)
-    }
 });
 
 navigator.getUserMedia = navigator.getUserMedia ||

@@ -39,26 +39,40 @@
 </html>
 
 <script>
-
-    var socket = io.connect();
-      socket.on('event', function (data) {
-        console.log(data);
-        alert('got a message!');
-      });
-
-
 $(document).ready(function() {
     var startstream=document.getElementById("start-rec-btn");
     var stopstream=document.getElementById("stop-rec-btn")
     //window.top.close();
 
+    var flag=0;
+    var myvar;
 
+    
 
-    /*var myVar = setInterval(reRec, 50000);
-    function reRec(){
+    $("#start-rec-btn").click(function () {
+        if(flag==1){
+           return;
+        }
+    
+     myvar=setInterval(
+        
+        function reRec(){      
         console.log("restreaming");
-        //stopstream.click();
         startstream.click();
-    }*/
+    }, 50000);
+
+        console.log(flag);
+    });
+
+    
+    
+    
+    $("#stop-rec-btn").click(function () {
+        flag=1;
+        clearInterval(myvar);
+        console.log(flag);
+    });
+
+
 });
 </script>

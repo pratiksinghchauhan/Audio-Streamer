@@ -14,13 +14,14 @@ var ObjectId = require('mongodb').ObjectID;
 var url = 'mongodb://10.0.8.62:27017/SpeechToText';
 var emitter = require('events').EventEmitter;
 
+var transcript;
+
 
 const record = require('node-record-lpcm16');
 
 const Speech = require('@google-cloud/speech');
 
 const speech = Speech();
-
 
 
 var options = {
@@ -30,45 +31,13 @@ var options = {
 
 
 var insertDocument = function( db, msg, callback) {
-    db.collection('textResponse').findOne(
-       /* {
-             "uid" :  msg.uid,
-             "leadid" : msg.leadid
-        },*/ function(err, result) {
-            assert.equal(err, null);
-            console.log("inside fetch document ");
-            console.log(result);
-           /* if(result && result.leadid){
-                console.log('record already exists');
-                var text = result.speech;
-                var newspeech = text + msg.textresponse;        
-                db.collection('textResponse').updateOne(
-                    { 
-                        "uid" : msg.uid,
-                        "leadid" : msg.leadid
-                    },
-                    {
-                        $set: { "sp  eech": newspeech }
-                    }, function(err, result) {
-                    assert.equal(err, null);
-                    console.log("Updated a document ");
-                    callback();
-                });
-            }else{*/
                 db.collection('textResponse').insertOne( {
-                  /*  "leadid" : msg.leadid,
-                    "uid" :  msg.uid,*/
-                    "speech": msg,
+                    "speech": msg['speech'],
+                    "leadid":msg['leadID'],
                     ts: new Date()
-                }, function(err, result) {
-                    assert.equal(err, null);
-                    console.log("Inserted a document");
-                    callback();
-                });
-            });
-};
-    /*    });
-};*/
+                })
+            };
+
 
 
 
@@ -109,8 +78,13 @@ server.on('connection', function(client){
 
 
    client.on('error', console.error)
-         .on('stream', function(stream) {
+         .on('stream', function(stream,obj) {
            console.log("Stream started");
+           console.log(obj['leadID']);
+
+           leadID=obj['leadID']
+
+
 
 
   stream.pipe(speech.createRecognizeStream(request)
@@ -126,22 +100,11 @@ server.on('connection', function(client){
            console.log("restreaming");
            stream.pipe();
        }*/
-
-     function savemongo(){     
-            MongoClient.connect( url, function(err, db) {
-            assert.equal(null, err);
-            insertDocument(db , data.results[0].transcript, function() {
-                    db.close();
-            });
-       });
-       
-         
-     }
-
-      setInterval(savemongo, 55000); 
-       
-
-      console.log(data.results);     
+if( typeof data.results[0] != 'undefined'){
+       transcript=data.results[0].transcript;
+}
+      
+      //console.log(data.results);     
 
 if( typeof data.results[0] != 'undefined'){
        console.log(data.results[0].isFinal);  
@@ -149,11 +112,35 @@ if( typeof data.results[0] != 'undefined'){
           if(data.results[0].isFinal==true){  
             console.log("FINAL:" + data.results[0].transcript);
             fs.appendFile('results.txt',"FINAL:" + data.results[0].transcript +'\n');
-            savemongo();
-   
-}}}));
+            savemongo(data.results[0].transcript);  
+}}}
+));
 
          });
+    
+    function savemongo(trans){     
+         if( typeof trans != 'undefined'){
+            MongoClient.connect( url, function(err, db) {
+            console.log(trans);
+            console.log('save mongo');
+            msg={
+                "speech":trans,
+                "leadID":leadID
+            }    
+            insertDocument(db ,msg , function() {
+                    db.close();
+            });
+            })}
+        else
+          console.log("savemongo called but nothing to insert");         
+     }
+
+    client.on('close',function(){
+          console.log("connection closed from client side");
+          savemongo(transcript);
+      });
+ 
+
   console.log('Listening, press Ctrl+C to stop.');
 	
 });
