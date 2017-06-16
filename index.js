@@ -34,6 +34,7 @@ var insertDocument = function( db, msg, callback) {
                 db.collection('textResponse').insertOne( {
                     "speech": msg['speech'],
                     "leadid":msg['leadID'],
+                    "_id":msg['_id'],
                     ts: new Date()
                 })
             };
@@ -83,6 +84,9 @@ server.on('connection', function(client){
            console.log(obj['leadID']);
 
            leadID=obj['leadID']
+           uid=obj['uid']
+
+           console.log(uid);
 
 
 
@@ -125,7 +129,8 @@ if( typeof data.results[0] != 'undefined'){
             console.log('save mongo');
             msg={
                 "speech":trans,
-                "leadID":leadID
+                "leadID":leadID,
+                "_id":uid
             }    
             insertDocument(db ,msg , function() {
                     db.close();
