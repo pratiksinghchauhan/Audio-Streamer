@@ -49,7 +49,7 @@ $(function () {
         console.log('startrecording called');
         client = new BinaryClient('wss://'+location.host);
         client.on('open', function () {
-            bStream = client.createStream({sampleRate: resampleRate,leadID:leadid,uid:uid});
+            bStream = client.createStream({sampleRate: resampleRate,leadID:'leadid',uid:uid});
         });
         if (context) {
             recorder.connect(context.destination);

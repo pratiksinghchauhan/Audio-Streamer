@@ -30,13 +30,38 @@ var options = {
 };
 
 
-var insertDocument = function( db, msg, callback) {
-                db.collection('textResponse').insertOne( {
-                    "speech": msg['speech'],
-                    "leadid":msg['leadID'],
-                    "_id":msg['_id'],
-                    ts: new Date()
-                })
+var insertDocument = function( db, msg, callback) {              
+               console.log(msg['leadID']);
+               var lastlead=db.collection('textResponse').findOne({$query:{leadid:'leadid'},$orderby:{ts:-1}});
+               console.log(lastlead);
+               console.log(lastlead._id);
+                if (lastlead  && lastlead.leadid){
+                    console.log("leadid was found");
+                    var now = new Date();
+                    var lastresponse = lastlead.ts;
+                    var diff = now - lastresponse ;
+                     
+                     if(diff < 120000){
+                         console.log("inside 120 sec");
+                         text=lastlead.speech+msg['speech'];
+                         db.collection('textResponse').updateOne({_id:lastlead._id},{$set:{speech:text}});
+
+                     }else{
+                        console.log("outside 120 sec");
+                            db.collection('textResponse').insertOne( {
+                            "speech": msg['speech'],
+                            "leadid":msg['leadID'],
+                            ts: new Date()
+                        })
+                     }
+                }else{
+                        db.collection('textResponse').insertOne({
+                        "speech": msg['speech'],
+                        "leadid":msg['leadID'],
+                        ts: new Date()
+                    })
+                    console.log("data saved");
+                }
             };
 
 
@@ -104,9 +129,10 @@ server.on('connection', function(client){
        }*/
 if( typeof data.results[0] != 'undefined'){
        transcript=data.results[0].transcript;
+       console.log(transcript);
 }
       
-      console.log(data.results);     
+     // console.log(data.results);     
 
 if( typeof data.results[0] != 'undefined'){
        console.log(data.results[0].isFinal);  
@@ -130,9 +156,8 @@ if( typeof data.results[0] != 'undefined'){
                 "leadID":leadID,
                 "_id":uid
             }    
-            insertDocument(db ,msg , function() {
-                    db.close();
-            });
+            insertDocument(db ,msg)
+
             })}
         else
           console.log("savemongo called but nothing to insert");         
