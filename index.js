@@ -32,10 +32,10 @@ var options = {
 
 var insertDocument = function( db, msg, callback) {              
                console.log(msg['leadID']);
-               var lastlead=db.collection('textResponse').findOne({$query:{leadid:'leadid'},$orderby:{ts:-1}});
-               console.log(lastlead);
-               console.log(lastlead._id);
-                if (lastlead  && lastlead.leadid){
+
+                db.collection('textResponse').findOne({leadid:'leadid'}, {sort: {ts:-1}}, function(err, lastlead) {
+                    console.log(lastlead);
+                     if (lastlead  && lastlead.leadid){
                     console.log("leadid was found");
                     var now = new Date();
                     var lastresponse = lastlead.ts;
@@ -44,7 +44,9 @@ var insertDocument = function( db, msg, callback) {
                      if(diff < 120000){
                          console.log("inside 120 sec");
                          text=lastlead.speech+msg['speech'];
-                         db.collection('textResponse').updateOne({_id:lastlead._id},{$set:{speech:text}});
+                         console.log(text);
+                         db.collection('textResponse').updateOne({_id:lastlead._id},{$set:{speech:text,ts:new Date()}});
+                         console.log("updated");
 
                      }else{
                         console.log("outside 120 sec");
@@ -62,10 +64,8 @@ var insertDocument = function( db, msg, callback) {
                     })
                     console.log("data saved");
                 }
+                });
             };
-
-
-
 
 var server=https.createServer(options,app);
 
