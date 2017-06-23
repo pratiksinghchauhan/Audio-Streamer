@@ -107,9 +107,7 @@ server.on('connection', function(client){
            console.log(obj['leadID']);
 
            leadID=obj['leadID']
-           uid=obj['uid']
 
-           console.log(uid);
 
 
 
@@ -154,7 +152,6 @@ if( typeof data.results[0] != 'undefined'){
             msg={
                 "speech":trans,
                 "leadID":leadID,
-                "_id":uid
             }    
             insertDocument(db ,msg)
 

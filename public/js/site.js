@@ -2,12 +2,7 @@
 
 $(function () {
 
-    function guid() {           
-            function s4() {
-            return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-        }
-        return s4() + s4() + '-' + s4() + '-' + s4() + '-' +s4() + '-' + s4() + s4() + s4();
-}
+
 
      startstream=document.getElementById("start-rec-btn");
      stopstream=document.getElementById("stop-rec-btn")
@@ -20,7 +15,6 @@ $(function () {
         contextSampleRate = (new AudioContext()).sampleRate;
         resampleRate = contextSampleRate,
         worker = new Worker('js/worker/resampler-worker.js');
-    var uid=guid();
 
     var flag=0;
     var myvar=0;
@@ -49,7 +43,7 @@ $(function () {
         console.log('startrecording called');
         client = new BinaryClient('wss://'+location.host);
         client.on('open', function () {
-            bStream = client.createStream({sampleRate: resampleRate,leadID:'leadid',uid:uid});
+            bStream = client.createStream({sampleRate: resampleRate,leadID:leadid});
         });
         if (context) {
             recorder.connect(context.destination);
