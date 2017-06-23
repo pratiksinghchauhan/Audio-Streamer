@@ -33,7 +33,7 @@ var options = {
 var insertDocument = function( db, msg, callback) {              
                console.log(msg['leadID']);
 
-                db.collection('textResponse').findOne({leadid:'leadid'}, {sort: {ts:-1}}, function(err, lastlead) {
+                db.collection('textResponse').findOne({leadid:msg['leadID']}, {sort: {ts:-1}}, function(err, lastlead) {
                     console.log(lastlead);
                      if (lastlead  && lastlead.leadid){
                     console.log("leadid was found");
