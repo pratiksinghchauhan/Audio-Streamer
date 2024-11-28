@@ -22,7 +22,7 @@
     "binaryjs": "^0.2.1",
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
-    "mongodb": "^2.2.26",
+    "mongodb": "^3.6.1",
     "node-record-lpcm16": "^0.3.0",
     "socket.io": "^2.0.3"
   }
